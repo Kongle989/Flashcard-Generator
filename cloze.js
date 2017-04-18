@@ -8,15 +8,10 @@ let ClozeCard = function (text, cloze) {
 //USING STRING METHOD REPLACE TO REMOVE PART OF SENTENCE
 ClozeCard.prototype.partText = function () {
     return this.text.replace(this.cloze, '..........');
-
 };
 // DISPLAY ONLY THE SOLUTION
 ClozeCard.prototype.clozeText = function () {
     return this.cloze;
-};
-// DISPLAY THE FULL TEXT WITH SOLUTION
-ClozeCard.prototype.fullText = function () {
-    return this.text;
 };
 
 module.exports = ClozeCard;

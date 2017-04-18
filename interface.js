@@ -2,8 +2,8 @@
 let inquirer = require('inquirer'),
     basicCard = require('./basic.js'),
     clozeCard = require('./cloze.js'),
-    basicFlashCards = [],
-    clozeFlashCards = [];
+    bFlashCards = [],
+    cFlashCards = [];
 
 let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
         inquirer.prompt([
@@ -19,7 +19,7 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
                     makeCardMenu();
                     break;
                 case 'Take Quiz':
-                    if (basicFlashCards.length === 0 && clozeFlashCards.length === 0) {
+                    if (bFlashCards.length === 0 && cFlashCards.length === 0) {
                         console.log('No cards available');
                         mainMenu();
                     } else quizMenu();
@@ -54,18 +54,20 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
             let count = 0;
             switch (res.quiz) {
                 case 'Basic Quiz':
-                    if (basicFlashCards.length === 0) {
+                    if (bFlashCards.length === 0) {
                         console.log('No basic cards available.');
                         quizMenu();
                     } else {
-                        basicQuiz(basicFlashCards[count].front, basicFlashCards[count].back, basicFlashCards.length, count);
+                        basicQuiz(bFlashCards[count].front, bFlashCards[count].back, bFlashCards.length, count);
                     }
                     break;
                 case 'Cloze Quiz':
-                    if (clozeFlashCards.length === 0) {
+                    if (cFlashCards.length === 0) {
                         console.log('No cloze cards available.');
                         quizMenu();
-                    } else clozeQuiz();
+                    } else {
+                        clozeQuiz(cFlashCards[count].partText(), cFlashCards[count].cloze, cFlashCards.length, count);
+                    }
                     break;
             }
         })
@@ -84,8 +86,8 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
             }
         ]).then(function (res) {
             let card = basicCard(res.front, res.back);
-            basicFlashCards.push(card); // basicFlashCards[0].front and basicFlashCards[0].back
-            console.log(basicFlashCards);
+            bFlashCards.push(card); // bFlashCards[0].front and bFlashCards[0].back
+            console.log(bFlashCards);
             inquirer.prompt([
                 {
                     type: 'list',
@@ -113,7 +115,19 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
             }
         ]).then(function (res) {
             let card = clozeCard(res.full, res.hide);
-            clozeFlashCards.push(card);
+            cFlashCards.push(card);
+            console.log(cFlashCards);
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'option',
+                    message: 'Make another?',
+                    choices: ['Yes', 'No']
+                }
+            ]).then(function (res) {
+                if (res.option === 'Yes') makeClozeCard();
+                else mainMenu();
+            })
         })
     },
     basicQuiz = function (front, back, length, count) { // START BASIC QUIZ
@@ -132,7 +146,7 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
             }
             count++;
             if (count < length) {
-                basicQuiz(basicFlashCards[count].front, basicFlashCards[count].back, length, count)
+                basicQuiz(bFlashCards[count].front, bFlashCards[count].back, length, count)
             }
             else {
                 console.log('No more cards');
@@ -141,8 +155,30 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
         })
     },
 
-    clozeQuiz = function () { // START CLOZE QUIZ
-
+    clozeQuiz = function (part, answer, length, count) { // START CLOZE QUIZ
+        inquirer.prompt([
+            {
+                type: 'input',
+                name: 'answer',
+                message: part
+            }
+        ]).then(function (res) {
+            if (res.answer === answer) {
+                console.log('Correct!');
+            }
+            else {
+                console.log('Sorry the correct answer is:');
+                console.log(cFlashCards[count].text);
+            }
+            count++;
+            if (count < length) {
+                clozeQuiz(cFlashCards[count].partText(), cFlashCards[count].clozeText(), length, count)
+            }
+            else {
+                console.log('No more cards');
+                mainMenu();
+            }
+        })
     };
 
 mainMenu(); // START PROMPT
