@@ -77,12 +77,26 @@ let mainMenu = function () { // ASK TO MAKE CARD OR TAKE QUIZ
             {
                 type: 'input',
                 name: 'front',
-                message: 'Front of card'
+                message: 'Front of card',
+                validate: function (input) {
+                    if (input === '') {
+                        console.log('Card cannot be blank');
+                        return false;
+                    }
+                    else return true;
+                }
             },
             {
                 type: 'input',
                 name: 'back',
-                message: 'Back of card'
+                message: 'Back of card',
+                validate: function (input) {
+                    if (input === '') {
+                        console.log('Card cannot be blank');
+                        return false;
+                    }
+                    else return true;
+                }
             }
         ]).then(function (res) {
             let card = basicCard(res.front, res.back);
